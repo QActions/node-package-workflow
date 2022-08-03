@@ -8,7 +8,7 @@ on:
     secrets:
       NPM_TOKEN:
         required: true
-      GITHUB_TOKEN:
+      GITHUB_PACKAGES_TOKEN:
         required: true
 
 jobs:
@@ -28,7 +28,7 @@ jobs:
         registry-url: 'https://npm.pkg.github.com'
     - name: Create .npmrc
       run: |
-        echo "//npm.pkg.github.com/:_authToken=${{secrets.GITHUB_TOKEN}}" > .npmrc
+        echo "//npm.pkg.github.com/:_authToken=${{secrets.GITHUB_PACKAGES_TOKEN}}" > .npmrc
         echo "//registry.npmjs.org/:_authToken=${{secrets.NPM_TOKEN}}" >> .npmrc
     - name: Install dependencies
       run: yarn

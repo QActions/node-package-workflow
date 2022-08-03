@@ -21,7 +21,7 @@ jobs:
       nodeVersion: '16.x'
     secrets:
       NPM_TOKEN: ${{ secrets.NPM_PACKAGES_FULL_READ_ACCESS_TOKEN }}
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 Example of how the build workflow can be used in a package repository:
@@ -44,5 +44,5 @@ jobs:
       nodeVersion: '16.x'
     secrets:
       NPM_TOKEN: ${{ secrets.NPM_PACKAGES_FULL_READ_ACCESS_TOKEN }}
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
