@@ -1,0 +1,40 @@
+name: Build Node Package
+on:
+  workflow_call:
+    inputs:
+      nodeVersion:
+        description: 'Node Version'
+        required: true
+    secrets:
+      NPM_TOKEN:
+        required: true
+      GITHUB_TOKEN:
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+
+    - name: Expose project info
+      uses: QActions/expose-project-info@1.0.0
+
+    - uses: actions/setup-node@v3
+      with:
+        node-version: ${{inputs.nodeVersion}}
+        registry-url: 'https://npm.pkg.github.com'
+    - name: Create .npmrc
+      run: |
+        echo "//npm.pkg.github.com/:_authToken=${{secrets.GITHUB_TOKEN}}" > .npmrc
+        echo "//registry.npmjs.org/:_authToken=${{secrets.NPM_TOKEN}}" >> .npmrc
+    - name: Install dependencies
+      run: yarn
+    - name: Run tests
+      run: yarn test --silent
+    - name: Build
+      run: yarn build
+    - name: Install production dependencies
+      run: yarn --production

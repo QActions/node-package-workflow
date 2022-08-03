@@ -1,0 +1,60 @@
+name: Build and Publish Node Package
+on:
+  workflow_call:
+    inputs:
+      nodeVersion:
+        description: 'Node Version'
+        required: true
+    secrets:
+      NPM_TOKEN:
+        required: true
+      GITHUB_TOKEN:
+        required: true
+
+jobs:
+  buildAndPublish:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+
+    - name: Expose project info
+      uses: QActions/expose-project-info@1.0.0
+
+    - uses: actions/setup-node@v3
+      with:
+        node-version: ${{inputs.nodeVersion}}
+        registry-url: 'https://npm.pkg.github.com'
+    - name: Create .npmrc
+      run: |
+        echo "//npm.pkg.github.com/:_authToken=${{secrets.GITHUB_TOKEN}}" > .npmrc
+        echo "//registry.npmjs.org/:_authToken=${{secrets.NPM_TOKEN}}" >> .npmrc
+    - name: Install dependencies
+      run: yarn
+    - name: Run tests
+      run: yarn test --silent
+    - name: Build
+      run: yarn build
+    - name: Install production dependencies
+      run: yarn --production
+    - name: Publish
+      env:
+        NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      run: |
+        if [ "${{github.ref}}" == "refs/heads/master" ]
+        then
+          image_tag=${{env.PROJECT_VERSION}}
+        else
+          if [ "${{github.ref}}" == "refs/heads/dev" ]
+          then
+            branch_tag="dev"
+          else
+            branch_tag="feat"
+          fi
+          sha=${{github.sha}}
+          short_commit_hash=${sha:0:7}
+          image_tag=${{env.PROJECT_VERSION}}-$branch_tag-${{github.run_number}}-$short_commit_hash
+        fi
+        yarn publish --new-version $image_tag --registry https://npm.pkg.github.com/ --verbose --no-git-tag-version
+        echo Package published with version: ${image_tag}
