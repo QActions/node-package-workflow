@@ -3,6 +3,7 @@ on:
   workflow_call:
     inputs:
       nodeVersion:
+        type: string
         description: 'Node Version'
         required: true
     secrets:
