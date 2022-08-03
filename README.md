@@ -17,11 +17,11 @@ on:
 jobs:
   buildAndPublish:
     uses: QActions/node-package-workflow/.github/workflows/buildAndPublish.yaml@1.0.0
-    inputs:
-      nodeVersion: '16.x'
     secrets:
       NPM_TOKEN: ${{ secrets.NPM_PACKAGES_FULL_READ_ACCESS_TOKEN }}
       GITHUB_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    with:
+      nodeVersion: 16.x
 ```
 
 Example of how the build workflow can be used in a package repository:
@@ -40,9 +40,9 @@ on:
 jobs:
   build:
     uses: QActions/node-package-workflow/.github/workflows/build.yaml@1.0.0
-    inputs:
-      nodeVersion: '16.x'
     secrets:
       NPM_TOKEN: ${{ secrets.NPM_PACKAGES_FULL_READ_ACCESS_TOKEN }}
       GITHUB_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    with:
+      nodeVersion: 16.x
 ```

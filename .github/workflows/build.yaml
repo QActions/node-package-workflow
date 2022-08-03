@@ -37,5 +37,3 @@ jobs:
       run: yarn test --silent
     - name: Build
       run: yarn build
-    - name: Install production dependencies
-      run: yarn --production
