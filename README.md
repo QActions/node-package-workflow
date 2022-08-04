@@ -18,10 +18,8 @@ jobs:
   buildAndPublish:
     uses: QActions/node-package-workflow/.github/workflows/buildAndPublish.yaml@1.0.0
     secrets:
-      NPM_TOKEN: ${{ secrets.NPM_PACKAGES_FULL_READ_ACCESS_TOKEN }}
-      GITHUB_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    with:
-      nodeVersion: 16.x
+      GITHUB_READ_TOKEN: ${{ secrets.GH_PACKAGES_FULL_READ_ACCESS_TOKEN }}
+      GITHUB_WRITE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 Example of how the build workflow can be used in a package repository:
@@ -41,8 +39,6 @@ jobs:
   build:
     uses: QActions/node-package-workflow/.github/workflows/build.yaml@1.0.0
     secrets:
-      NPM_TOKEN: ${{ secrets.NPM_PACKAGES_FULL_READ_ACCESS_TOKEN }}
-      GITHUB_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    with:
-      nodeVersion: 16.x
+      GITHUB_READ_TOKEN: ${{ secrets.GH_PACKAGES_FULL_READ_ACCESS_TOKEN }}
+      GITHUB_WRITE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```

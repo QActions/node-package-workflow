@@ -1,19 +1,14 @@
 name: Build Node Package
 on:
   workflow_call:
-    inputs:
-      nodeVersion:
-        type: string
-        description: 'Node Version'
-        required: true
     secrets:
-      NPM_TOKEN:
+      GITHUB_READ_TOKEN:
         required: true
-      GITHUB_PACKAGES_TOKEN:
+      GITHUB_WRITE_TOKEN:
         required: true
 
 jobs:
-  build:
+  buildAndPublish:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,15 +20,17 @@ jobs:
 
     - uses: actions/setup-node@v3
       with:
-        node-version: ${{inputs.nodeVersion}}
+        node-version: 16.x
         registry-url: 'https://npm.pkg.github.com'
-    - name: Create .npmrc
-      run: |
-        echo "//npm.pkg.github.com/:_authToken=${{secrets.GITHUB_PACKAGES_TOKEN}}" > .npmrc
-        echo "//registry.npmjs.org/:_authToken=${{secrets.NPM_TOKEN}}" >> .npmrc
+        cache: 'yarn'
+
     - name: Install dependencies
       run: yarn
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.GITHUB_READ_TOKEN }}
+
     - name: Run tests
-      run: yarn test --silent
+      run: yarn test:ci
+
     - name: Build
       run: yarn build

@@ -1,15 +1,10 @@
 name: Build and Publish Node Package
 on:
   workflow_call:
-    inputs:
-      nodeVersion:
-        type: string
-        description: 'Node Version'
-        required: true
     secrets:
-      NPM_TOKEN:
+      GITHUB_READ_TOKEN:
         required: true
-      GITHUB_PACKAGES_TOKEN:
+      GITHUB_WRITE_TOKEN:
         required: true
 
 jobs:
@@ -25,37 +20,40 @@ jobs:
 
     - uses: actions/setup-node@v3
       with:
-        node-version: ${{inputs.nodeVersion}}
+        node-version: 16.x
         registry-url: 'https://npm.pkg.github.com'
-    - name: Create .npmrc
-      run: |
-        echo "//npm.pkg.github.com/:_authToken=${{secrets.GITHUB_PACKAGES_TOKEN}}" > .npmrc
-        echo "//registry.npmjs.org/:_authToken=${{secrets.NPM_TOKEN}}" >> .npmrc
+        cache: 'yarn'
+
     - name: Install dependencies
       run: yarn
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.GITHUB_READ_TOKEN }}
+
     - name: Run tests
-      run: yarn test --silent
+      run: yarn test:ci
+
     - name: Build
       run: yarn build
-    - name: Install production dependencies
-      run: yarn --production
+
     - name: Publish
-      env:
-        NODE_AUTH_TOKEN: ${{secrets.GITHUB_PACKAGES_TOKEN}}
       run: |
         if [ "${{github.ref}}" == "refs/heads/master" ]
         then
-          image_tag=${{env.PROJECT_VERSION}}
+          version=${{env.PROJECT_VERSION}}
+          tag=latest
         else
           if [ "${{github.ref}}" == "refs/heads/dev" ]
           then
-            branch_tag="dev"
+            tag="dev"
           else
-            branch_tag="feat"
+            tag="feat"
           fi
           sha=${{github.sha}}
           short_commit_hash=${sha:0:7}
-          image_tag=${{env.PROJECT_VERSION}}-$branch_tag-${{github.run_number}}-$short_commit_hash
+          version=${{env.PROJECT_VERSION}}-$tag-${{github.run_number}}-$short_commit_hash
         fi
-        yarn publish --new-version $image_tag --registry https://npm.pkg.github.com/ --verbose --no-git-tag-version
-        echo Package published with version: ${image_tag}
+
+        yarn publish --new-version $version --tag $tag --access restricted --no-git-tag-version --verbose
+        echo Package published with version: ${version}
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.GITHUB_WRITE_TOKEN }}
