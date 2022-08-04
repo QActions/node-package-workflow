@@ -1,0 +1,36 @@
+name: Build Node Package
+on:
+  workflow_call:
+    secrets:
+      GITHUB_READ_TOKEN:
+        required: true
+      GITHUB_WRITE_TOKEN:
+        required: true
+
+jobs:
+  buildAndPublish:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+
+    - name: Expose project info
+      uses: QActions/expose-project-info@1.0.0
+
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 16.x
+        registry-url: 'https://npm.pkg.github.com'
+        cache: 'yarn'
+
+    - name: Install dependencies
+      run: yarn
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.GITHUB_READ_TOKEN }}
+
+    - name: Run tests
+      run: yarn test:ci
+
+    - name: Build
+      run: yarn build

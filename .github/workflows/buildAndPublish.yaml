@@ -1,0 +1,59 @@
+name: Build and Publish Node Package
+on:
+  workflow_call:
+    secrets:
+      GITHUB_READ_TOKEN:
+        required: true
+      GITHUB_WRITE_TOKEN:
+        required: true
+
+jobs:
+  buildAndPublish:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+
+    - name: Expose project info
+      uses: QActions/expose-project-info@1.0.0
+
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 16.x
+        registry-url: 'https://npm.pkg.github.com'
+        cache: 'yarn'
+
+    - name: Install dependencies
+      run: yarn
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.GITHUB_READ_TOKEN }}
+
+    - name: Run tests
+      run: yarn test:ci
+
+    - name: Build
+      run: yarn build
+
+    - name: Publish
+      run: |
+        if [ "${{github.ref}}" == "refs/heads/master" ]
+        then
+          version=${{env.PROJECT_VERSION}}
+          tag=latest
+        else
+          if [ "${{github.ref}}" == "refs/heads/dev" ]
+          then
+            tag="dev"
+          else
+            tag="feat"
+          fi
+          sha=${{github.sha}}
+          short_commit_hash=${sha:0:7}
+          version=${{env.PROJECT_VERSION}}-$tag-${{github.run_number}}-$short_commit_hash
+        fi
+
+        yarn publish --new-version $version --tag $tag --access restricted --no-git-tag-version --verbose
+        echo Package published with version: ${version}
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.GITHUB_WRITE_TOKEN }}
