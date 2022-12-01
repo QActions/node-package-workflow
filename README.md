@@ -16,7 +16,7 @@ on:
 
 jobs:
   buildAndPublish:
-    uses: QActions/node-package-workflow/.github/workflows/buildAndPublish.yaml@1.0.0
+    uses: QActions/node-package-workflow/.github/workflows/buildAndPublish.yaml@1.1.0
     secrets:
       GITHUB_READ_TOKEN: ${{ secrets.GH_PACKAGES_FULL_READ_ACCESS_TOKEN }}
       GITHUB_WRITE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -37,7 +37,7 @@ on:
 
 jobs:
   build:
-    uses: QActions/node-package-workflow/.github/workflows/build.yaml@1.0.0
+    uses: QActions/node-package-workflow/.github/workflows/build.yaml@1.1.0
     secrets:
       GITHUB_READ_TOKEN: ${{ secrets.GH_PACKAGES_FULL_READ_ACCESS_TOKEN }}
       GITHUB_WRITE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
