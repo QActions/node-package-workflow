@@ -41,6 +41,10 @@ jobs:
         then
           version=${{env.PROJECT_VERSION}}
           tag=latest
+
+          # Tag the commit with the correct version
+          git tag $version
+          git push origin $version
         else
           if [ "${{github.ref}}" == "refs/heads/dev" ]
           then
